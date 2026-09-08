@@ -1,0 +1,66 @@
+# West manifest for the ZBook interface SDK (T2 topology: this repo is both
+# the manifest and the app -- interface/ is auto-discovered as a Zephyr
+# module via zephyr/module.yml, no manual CMakeLists/Kconfig wiring needed).
+#
+#   west init -m git@github.com:zephyr-book/sdk-zbook-interface.git zbook-sdk
+#   cd zbook-sdk && west update
+#
+# Everything west manages lands under deps/, except the board module, which is
+# a sibling of this repo at the workspace root. To add a language binding
+# (sdk-lua, sdk-micropython, ...), add it as a project below with
+# `import: true` -- its own west.yml pulls its runtime dependencies
+# transitively, and its zephyr/module.yml is auto-discovered the same way.
+#
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) Centro de Inovacao EDGE
+
+manifest:
+        version: "0.13"
+        remotes:
+                - name: zephyrproject
+                  url-base: https://github.com/zephyrproject-rtos
+
+                - name: zephyr-book
+                  url-base: https://github.com/zephyr-book
+
+        projects:
+                - name: zephyr
+                  remote: zephyrproject
+                  revision: v4.4.2
+                  west-commands: scripts/west-commands.yml
+                  clone-depth: 1
+                  # path-prefix below also prepends to this project's own path,
+                  # so `path: zephyr` resolves to deps/zephyr.
+                  path: zephyr
+                  import:
+                          path-prefix: deps/
+                          # Only what the samples actually build against --
+                          # importing all of Zephyr's modules costs several GB.
+                          name-allowlist:
+                                  # RP2350B SoC support and its CMSIS headers.
+                                  - hal_rpi_pico
+                                  - cmsis_6
+                                  - picolib
+                                  # LittleFS backs the persisted Wi-Fi
+                                  # credentials (see bringup_p2/wifi.conf and
+                                  # the board's zbook-wifi-credentials-littlefs
+                                  # snippet).
+                                  - littlefs
+                                  # FatFs is not optional even for an app that
+                                  # never touches the microSD: the board's
+                                  # own defconfig sets CONFIG_FILE_SYSTEM and
+                                  # CONFIG_FAT_FILESYSTEM_ELM, so the zephyr
+                                  # tree compiles subsys/fs/fat_fs.c and needs
+                                  # this module's ff.h.
+                                  - fatfs
+
+                # ZBook board support, shipped as a Zephyr module: it registers
+                # board_root/dts_root/snippet_root via zephyr/module.yml, so
+                # `-b zbook@p2/rp2350b/m33` is auto-discovered with no
+                # BOARD_ROOT on the command line.
+                - name: zbook
+                  remote: zephyr-book
+                  revision: main
+
+        self:
+                path: sdk

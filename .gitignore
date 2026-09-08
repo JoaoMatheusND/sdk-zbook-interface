@@ -1,0 +1,29 @@
+# West/Zephyr workspace artifacts
+/build/
+/build-*/
+/twister-out/
+/.west/
+/deps/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json
+cmake-build-*/
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Python (west, twister, pyocd, ...)
+__pycache__/
+*.pyc
+.venv/
+venv/

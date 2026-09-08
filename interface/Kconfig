@@ -1,0 +1,9 @@
+menu "ZBook Interface"
+
+rsource "Kconfig.actuators"
+rsource "Kconfig.io"
+rsource "Kconfig.protocols"
+rsource "Kconfig.sensors"
+rsource "Kconfig.storage"
+
+endmenu

@@ -1,3 +1,0 @@
-name: sdk-zbook-interface
-append:
-  EXTRA_DTC_OVERLAY_FILE: zbook.overlay

@@ -4,6 +4,6 @@
 
 zephyr_library()
 
-# if(CONFIG_ZBOOK_INTERFACE_PROTOCOLS)
-#   zephyr_library_sources_ifdef(CONFIG_ZBOOK_* <file>.c)
-# endif()
+if(CONFIG_ZBOOK_INTERFACE_PROTOCOLS)
+  zephyr_library_sources_ifdef(CONFIG_ZBOOK_INTERFACE_PROTOCOLS_UART zbook_uart.c)
+endif()

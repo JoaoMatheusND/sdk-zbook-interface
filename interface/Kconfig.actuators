@@ -26,6 +26,42 @@ menu "ZBook Interface - Actuators"
             help
                 Set the fast blink duration for the ZBook LED actuator in milliseconds.
     endmenu
+
+    menu "ZBook Buzzer Actuator"
+        config ZBOOK_BUZZER
+            bool "Enable ZBook buzzer actuator"
+            select PWM
+            default y
+            help
+                Enable the ZBook piezo buzzer actuator interface.
+
+        if ZBOOK_BUZZER
+            config ZBOOK_BUZZER_BEEP_DURATION_SHORT_MS
+                int "Short beep preset duration (ms)"
+                default 100
+                help
+                    Set the "short" preset beep duration for the ZBook buzzer actuator in
+                    milliseconds.
+
+            config ZBOOK_BUZZER_BEEP_DURATION_NORMAL_MS
+                int "Normal beep preset duration (ms)"
+                default 300
+                help
+                    Set the "normal" preset beep duration for the ZBook buzzer actuator in
+                    milliseconds.
+
+            config ZBOOK_BUZZER_BEEP_DURATION_LONG_MS
+                int "Long beep preset duration (ms)"
+                default 800
+                help
+                    Set the "long" preset beep duration for the ZBook buzzer actuator in
+                    milliseconds.
+
+            module = ZBOOK_BUZZER
+            module-str = zbook buzzer
+            source "subsys/logging/Kconfig.template.log_config"
+        endif # ZBOOK_BUZZER
+    endmenu
 endmenu
 
 module = LED

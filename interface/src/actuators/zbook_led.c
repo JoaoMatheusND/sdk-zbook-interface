@@ -40,7 +40,7 @@ LOG_MODULE_REGISTER(zbook_led, CONFIG_LED_LOG_LEVEL);
 		}                                                                                  \
 	} while (0)
 
-struct {
+static struct {
 	const struct gpio_dt_spec led[ZBOOK_LED_ALL];
 	enum zbook_led_state state[ZBOOK_LED_ALL];
 	struct k_timer blink_timer;

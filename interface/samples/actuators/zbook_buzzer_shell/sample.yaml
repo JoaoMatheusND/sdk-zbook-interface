@@ -1,0 +1,16 @@
+sample:
+  name: ZBook buzzer shell
+  description: >
+    Bring-up sample exposing the zbook piezo buzzer actuator (on/off/volume/
+    frequency/beep/music) as shell commands, for manually validating the
+    onboard buzzer on real P2 hardware over the console.
+tests:
+  sample.actuators.buzzer:
+    tags:
+      - samples
+      - interface
+      - actuators
+      - buzzer
+    platform_allow:
+      - zbook@p2/rp2350b/m33
+    build_only: true

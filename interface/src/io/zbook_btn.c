@@ -55,7 +55,7 @@ static const struct device *buttons_dev = DEVICE_DT_GET(BUTTONS_NODE);
  * both the input callback and the timer handler can reach everything via
  * CONTAINER_OF, with no manual index bookkeeping.
  */
-struct zbook_btn_ctx {
+static struct zbook_btn_ctx {
 	enum zbook_btn btn;                /**< The button this context is for */
 	uint16_t code;                     /**< The zephyr,code identifying this button */
 	enum zbook_btn_evt evt_mask;       /**< The event mask this button is registered for */

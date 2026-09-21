@@ -12,7 +12,12 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project(zbook_interface)
 
-target_sources(app PRIVATE main.c)
+target_sources(app PRIVATE
+    main.c
+    src/zbook_led_shell.c
+    src/zbook_btn_shell.c
+    src/zbook_buzzer_shell.c
+)
 
 # interface/ is auto-discovered as a Zephyr module via zephyr/module.yml --
 # no add_subdirectory/glob needed here. Language-binding modules (sdk-lua,

@@ -1,3 +1,9 @@
 menu "ZBook Interface - Sensors"
 
+config ZBOOK_INTERFACE_SENSORS
+    bool "Enable ZBook Interface Sensors"
+    default n
+    help
+      Enable the ZBook Interface Sensors module.
+
 endmenu

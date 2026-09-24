@@ -22,13 +22,18 @@ symbol (e.g. `spi`, `uart`).
 
 ### Adding a new test
 
-`CMakeLists.txt` is 2 lines via the shared `unit.cmake` helper (find_package/
-project/target_sources boilerplate lives there once, not copy-pasted per
-test):
+`cmake_minimum_required()`/`find_package()`/`project()` must be literal in
+the test's own `CMakeLists.txt` -- CMake scans the top-level list file for
+those textually before running anything, so it can't see them through an
+`include()` + macro indirection. `unit.cmake` only wires up `target_sources`:
 
 ```cmake
+cmake_minimum_required(VERSION 3.20.0)
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
+project(test_zbook_<peripheral>)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../unit.cmake)
-zbook_unit_test(<peripheral>)
+zbook_unit_test()
 ```
 
 This expects `src/main.c` in the same directory. `prj.conf` and

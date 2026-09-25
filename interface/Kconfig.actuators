@@ -1,3 +1,9 @@
 menu "ZBook Interface - Actuators"
 
+config ZBOOK_INTERFACE_ACTUATORS
+    bool "Enable ZBook Interface Actuators"
+    default n
+    help
+      Enable the ZBook Interface Actuators module.
+
 endmenu

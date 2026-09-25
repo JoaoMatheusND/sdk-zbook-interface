@@ -1,3 +1,9 @@
 menu "ZBook Interface - Storage"
 
+config ZBOOK_INTERFACE_STORAGE
+    bool "Enable ZBook Interface Storage"
+    default n
+    help
+      Enable the ZBook Interface Storage module.
+
 endmenu

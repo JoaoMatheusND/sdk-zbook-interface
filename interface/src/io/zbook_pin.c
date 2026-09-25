@@ -52,7 +52,7 @@ static const uint8_t pin_caps[ZBOOK_PIN_HEADER_AMOUNT] = {
 	CAPS_ADC,    /**< GPIO46 */
 };
 
-struct zbook_pin_backend {
+static struct zbook_pin_backend {
 	int (*init)(struct zbook_pin *pin, const struct zbook_pin_header_config *cfg);
 	void (*deinit)(struct zbook_pin *pin);
 	int (*read)(struct zbook_pin *pin, void *buf, size_t len);

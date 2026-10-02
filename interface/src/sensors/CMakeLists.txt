@@ -6,4 +6,5 @@ zephyr_library()
 
 if(CONFIG_ZBOOK_INTERFACE_SENSORS)
     zephyr_library_sources_ifdef(CONFIG_ZBOOK_INTERFACE_SENSORS_LDR zbook_ldr.c)
+    zephyr_library_sources_ifdef(CONFIG_ZBOOK_INTERFACE_SENSORS_POTENTIOMETER zbook_potentiometer.c)
 endif()

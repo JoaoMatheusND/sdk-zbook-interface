@@ -6,7 +6,7 @@
  * @version 0.1
  * @date 18/09/2026
  * 
- * @copyright Copyright (c) 2026
+ * @copyright Copyright (c) Centro de Inovacao EDGE - 2026
  *
  *******************************************************************/
 

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright (c) Centro de Inovacao EDGE
+ * Copyright (c) Centro de Inovacao EDGE - 2026
  */
 
 #include <errno.h>

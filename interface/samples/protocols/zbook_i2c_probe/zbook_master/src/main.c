@@ -10,7 +10,7 @@
  * fixture in samples/protocols/zbook_i2c_probe/nrf52_target/ to prove the
  * external bus reaches a real, independent device.
  *
- * @copyright Copyright (c) 2026
+ * @copyright Copyright (c) Centro de Inovacao EDGE - 2026
  *
  *******************************************************************/
 

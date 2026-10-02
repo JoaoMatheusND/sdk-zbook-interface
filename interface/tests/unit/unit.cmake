@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
-# Copyright (c) Centro de Inovacao EDGE
+# Copyright (c) Centro de Inovacao EDGE - 2026
 #
 # Shared boilerplate for interface unit tests (tests/unit/<category>/<peripheral>/).
 # Include from a test's CMakeLists.txt and call zbook_unit_test(<name>) once:

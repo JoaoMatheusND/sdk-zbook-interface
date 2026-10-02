@@ -17,11 +17,26 @@ config ZBOOK_INTERFACE_SENSORS
             help
                 Enable zbook_ldr_init/read, a pure-C passthrough over the Zephyr ADC
                 driver bound to the ldr_adc devicetree node.
+
+        config ZBOOK_INTERFACE_SENSORS_POTENTIOMETER
+          	bool "ZBook potentiometer sensor interface"
+            depends on ZBOOK_INTERFACE_SENSORS
+          	select ADC
+            default y
+          	help
+          	  Enable zbook_potentiometer_init/read, a pure-C passthrough over the Zephyr ADC
+          	  driver bound to the potentiometer devicetree node.
     endmenu
 endmenu
 
 if ZBOOK_INTERFACE_SENSORS_LDR
     module = LDR
     module-str = ldr
+    source "subsys/logging/Kconfig.template.log_config"
+endif
+
+if ZBOOK_INTERFACE_SENSORS_POTENTIOMETER
+    module = POTENTIOMETER
+    module-str = potentiometer
     source "subsys/logging/Kconfig.template.log_config"
 endif

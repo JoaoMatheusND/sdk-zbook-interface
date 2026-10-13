@@ -1,3 +1,15 @@
+/*******************************************************************
+ * @file zbook_i2c_loopback_emul.h
+ *
+ * @brief I2C loopback emulator test helpers for zbook_i2c's unit tests.
+ * @author Matheus Macário dos Santos (matheus.macario@edge.ufal.br)
+ * @version 0.1
+ * @date 18/09/2026
+ *
+ * @copyright Copyright (c) Centro de Inovacao EDGE - 2026
+ *
+ *******************************************************************/
+
 #ifndef ZBOOK_I2C_LOOPBACK_EMUL_H
 #define ZBOOK_I2C_LOOPBACK_EMUL_H
 

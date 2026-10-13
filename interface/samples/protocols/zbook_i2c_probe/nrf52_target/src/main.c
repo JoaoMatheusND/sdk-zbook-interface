@@ -1,19 +1,14 @@
-/*
- * I2C target fixture for validating zbook_i2c's external GPIO header --
- * registers a hand-written I2C target directly against i2c0 (no devicetree
- * child node, no zephyr,i2c-target-eeprom driver) so every phase of the
- * protocol -- address match, data transfer -- prints over RTT. That gives
- * direct, human-readable proof that the nRF52's TWIS hardware actually saw
- * a START+address on the wire and ACKed it, instead of trusting an opaque
- * EEPROM abstraction that never surfaces what happened on the bus.
+/*******************************************************************
+ * @file main.c
  *
- * The nRF TWIS driver (drivers/i2c/i2c_nrfx_twis.c) is DMA/buffer-based and
- * only ever calls the buf_* callbacks below -- write_requested/
- * read_requested/read_processed/stop are never invoked by this driver, so
- * they're omitted rather than left as dead code.
+ * @brief I2C target fixture for validating zbook_i2c's external GPIO header.
+ * @author Matheus Macário dos Santos (matheus.macario@edge.ufal.br)
+ * @version 0.1
+ * @date 18/09/2026
  *
- * SPDX-License-Identifier: Apache-2.0
- */
+ * @copyright Copyright (c) Centro de Inovacao EDGE - 2026
+ *
+ *******************************************************************/
 
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
@@ -59,6 +54,11 @@ static void target_buf_write_received(struct i2c_target_config *config, uint8_t 
 	printk("\n");
 }
 
+/* The nRF TWIS driver (drivers/i2c/i2c_nrfx_twis.c) is DMA/buffer-based and
+ * only ever calls the buf_* callbacks below -- write_requested/
+ * read_requested/read_processed/stop are never invoked by this driver, so
+ * they're omitted rather than left as dead code.
+ */
 static const struct i2c_target_callbacks target_callbacks = {
 	.buf_read_requested = target_buf_read_requested,
 	.buf_write_received = target_buf_write_received,

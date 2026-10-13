@@ -1,14 +1,10 @@
 /*******************************************************************
  * @file main.c
  *
- * @brief Real-hardware bring-up sample for the zbook I2C interface: scans
- * the external GPIO header's I2C bus (H1, I2C_SDA/I2C_SCL) every 2 seconds
- * and reports every address that ACKs. A one-shot ztest assertion doesn't
- * give enough visibility for live hardware bring-up -- this keeps scanning
- * and printing indefinitely so wiring changes, resets, or a device being
- * plugged/unplugged show up in real time on the console. Pair with the
- * fixture in samples/protocols/zbook_i2c_probe/nrf52_target/ to prove the
- * external bus reaches a real, independent device.
+ * @brief Sample application for the zbook I2C bus interface.
+ * @author Matheus Macário dos Santos (matheus.macario@edge.ufal.br)
+ * @version 0.1
+ * @date 18/09/2026
  *
  * @copyright Copyright (c) Centro de Inovacao EDGE - 2026
  *

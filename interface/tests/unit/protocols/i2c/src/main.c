@@ -1,8 +1,14 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
+/*******************************************************************
+ * @file main.c
  *
- * Copyright (c) Centro de Inovacao EDGE - 2026
- */
+ * @brief Unit tests for the zbook I2C bus interface.
+ * @author Matheus Macário dos Santos (matheus.macario@edge.ufal.br)
+ * @version 0.1
+ * @date 18/09/2026
+ *
+ * @copyright Copyright (c) Centro de Inovacao EDGE - 2026
+ *
+ *******************************************************************/
 
 #include <errno.h>
 #include <zephyr/ztest.h>

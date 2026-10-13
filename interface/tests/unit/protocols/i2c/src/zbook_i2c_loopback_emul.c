@@ -1,13 +1,14 @@
-/*
- * I2C loopback emulator backing the "zbook_i2c_target" devicetree node for
- * unit tests: on a write-only transfer it just records the bytes, on a
- * read-only transfer it stuffs the buffer with a fixed byte set via
- * zbook_i2c_test_emul_set_read_byte(), and on a write-then-read transfer
- * (zbook_i2c_write_read()'s repeated-start pattern) it does both -- records
- * the write half and answers the read half with the same canned byte. This
- * is a fixed address on the emulated i2c0 bus, distinct from the reserved
- * address main.c uses for "nothing attached" -- see boards/native_sim.overlay.
- */
+/*******************************************************************
+ * @file zbook_i2c_loopback_emul.c
+ *
+ * @brief I2C loopback emulator backing the "zbook_i2c_target" devicetree node for unit tests.
+ * @author Matheus Macário dos Santos (matheus.macario@edge.ufal.br)
+ * @version 0.1
+ * @date 18/09/2026
+ *
+ * @copyright Copyright (c) Centro de Inovacao EDGE - 2026
+ *
+ *******************************************************************/
 
 #include "zbook_i2c_loopback_emul.h"
 
@@ -61,6 +62,12 @@ static void fill_read(struct zbook_i2c_loopback_data *data, struct i2c_msg *msg)
 	memset(msg->buf, data->read_byte, msg->len);
 }
 
+/* On a write-only transfer this just records the bytes, on a read-only
+ * transfer it stuffs the buffer with the fixed byte set via
+ * zbook_i2c_test_emul_set_read_byte(), and on a write-then-read transfer
+ * (zbook_i2c_write_read()'s repeated-start pattern) it does both -- records
+ * the write half and answers the read half with the same canned byte.
+ */
 static int zbook_i2c_loopback_transfer(const struct emul *target, struct i2c_msg *msgs,
 					int num_msgs, int addr)
 {

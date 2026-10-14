@@ -12,7 +12,9 @@
 
 #include "io/zbook_pin.h"
 
+#include "io/zbook_io_adc.h"
 #include "io/zbook_io_gpio.h"
+#include "io/zbook_io_pwm.h"
 
 #include <errno.h>
 #include <zephyr/kernel.h>
@@ -102,9 +104,47 @@ static int gpio_backend_read(struct zbook_pin *pin, void *buf, size_t len)
 	return zbook_io_gpio_read(pin->gpio, &pin->ctx.gpio, buf, len);
 }
 
+static int pwm_backend_init(struct zbook_pin *pin, const struct zbook_pin_header_config *cfg)
+{
+	return zbook_io_pwm_init(pin->gpio, &cfg->pwm, &pin->ctx.pwm);
+}
+
+static void pwm_backend_deinit(struct zbook_pin *pin)
+{
+	zbook_io_pwm_deinit(pin->gpio);
+}
+
+static int pwm_backend_write(struct zbook_pin *pin, const void *buf, size_t len)
+{
+	return zbook_io_pwm_write(pin->gpio, &pin->ctx.pwm, buf, len);
+}
+
+#ifdef CONFIG_ADC
+static int adc_backend_init(struct zbook_pin *pin, const struct zbook_pin_header_config *cfg)
+{
+	return zbook_io_adc_init(pin->gpio, &cfg->adc, &pin->ctx.adc);
+}
+
+static void adc_backend_deinit(struct zbook_pin *pin)
+{
+	zbook_io_adc_deinit(pin->gpio);
+}
+
+static int adc_backend_read(struct zbook_pin *pin, void *buf, size_t len)
+{
+	return zbook_io_adc_read(pin->gpio, &pin->ctx.adc, buf, len);
+}
+#endif /* CONFIG_ADC */
+
 static const struct zbook_pin_backend backends[] = {
 	[ZBOOK_PIN_HEADER_FUNCTION_GPIO] = {gpio_backend_init, gpio_backend_deinit,
 					    gpio_backend_read, gpio_backend_write},
+	[ZBOOK_PIN_HEADER_FUNCTION_PWM] = {pwm_backend_init, pwm_backend_deinit, NULL,
+					   pwm_backend_write},
+#ifdef CONFIG_ADC
+	[ZBOOK_PIN_HEADER_FUNCTION_ADC] = {adc_backend_init, adc_backend_deinit, adc_backend_read,
+					   NULL},
+#endif
 };
 
 static const struct zbook_pin_backend *backend_for(enum zbook_pin_header_function function)
@@ -134,7 +174,7 @@ static inline void pin_teardown(struct zbook_pin *pin)
 	pin->configured = false;
 }
 
-bool zbook_pin_support_fn(enum zbook_pin_header gpio, enum zbook_pin_header_function function)
+bool zbook_pin_supports(enum zbook_pin_header gpio, enum zbook_pin_header_function function)
 {
 	bool supported = false;
 
@@ -159,7 +199,7 @@ int zbook_pin_set_function(enum zbook_pin_header gpio, const struct zbook_pin_he
 		return -EINVAL;
 	}
 
-	if (!zbook_pin_support_fn(gpio, cfg->function)) {
+	if (!zbook_pin_supports(gpio, cfg->function)) {
 		LOG_ERR("GPIO[%u] can not do function %d", gpio, cfg->function);
 		return -ENOTSUP;
 	}
@@ -254,8 +294,8 @@ static inline int zbook_rw_apply(struct zbook_pin *pin, const void *buf, size_t 
 
 	const struct zbook_pin_backend *curr_backend = backend_for(pin->function);
 
-	ret = is_read ? ZBOOK_PIN_BACKEND_CALL(curr_backend, read, pin, (void *)buf, len)
-		      : ZBOOK_PIN_BACKEND_CALL(curr_backend, write, pin, buf, len);
+	ret = is_read ? ZBOOK_PIN_CALL_BACKEND(curr_backend, read, pin, (void *)buf, len)
+		      : ZBOOK_PIN_CALL_BACKEND(curr_backend, write, pin, buf, len);
 
 	k_mutex_unlock(&pin->lock);
 

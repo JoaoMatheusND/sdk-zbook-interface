@@ -15,7 +15,9 @@
 #define ZBOOK_PIN_H
 
 #include "io/zbook_pin_cfg.h"
-#include "zbook_io_gpio.h"
+#include "io/zbook_io_adc.h"
+#include "io/zbook_io_gpio.h"
+#include "io/zbook_io_pwm.h"
 
 #include <zephyr/kernel.h>
 
@@ -42,18 +44,15 @@ struct zbook_pin {
 		// struct {
 		// } uart;
 
-		// struct {
-		// } pwm;
-
-		// struct {
-		// } adc;
+		struct zbook_pwm_ctx pwm; /**< PWM state, see zbook_io_pwm.h */
+		struct zbook_adc_ctx adc; /**< ADC state, see zbook_io_adc.h */
 	} ctx;
 };
 
 /**
- * @brief Assigns a function to a header pin. If the pin already holds a
+ * @brief Configures a header pin as a GPIO output.
  *
- * @param _state state
+ * @param _state Initial state (@ref enum zbook_pin_header_state)
  */
 #define ZBOOK_PIN_CFG_GPIO_OUT(_state)                                                             \
 	((struct zbook_pin_header_config){                                                         \
@@ -64,7 +63,7 @@ struct zbook_pin {
 	})
 
 /**
- * @brief Assigns a function to a header pin. If the pin already holds a
+ * @brief Configures a header pin as a GPIO input.
  *
  * @param _pull Pull configuration for the GPIO pin (@ref enum zbook_pin_header_pull)
  */
@@ -180,6 +179,7 @@ int zbook_pin_get_function(enum zbook_pin_header pin, enum zbook_pin_header_func
  * @brief Writes through the pin's current function. What the buffer means
  * depends on the function:
  * - GPIO: len == 1, buf[0] is an enum zbook_pin_header_state (output pins only).
+ * - PWM: len == 1, buf[0] is the new duty cycle in percent (0-100).
  * - UART (TX role): len bytes are transmitted.
  *
  * @param handle[in] Pin handle.
@@ -198,6 +198,7 @@ int zbook_pin_write(struct zbook_pin *handle, const void *buf, size_t len);
  * @brief Reads through the pin's current function. What comes back depends
  * on the function:
  * - GPIO: len == 1, buf[0] is set to ZBOOK_PIN_HEADER_STATE_LOW or _HIGH.
+ * - ADC: len == sizeof(uint16_t), buf holds one sample at the configured resolution.
  * - UART (RX role): up to len received bytes (see zbook_uart_read()).
  *
  * @param handle[in] Pin handle.
@@ -221,8 +222,7 @@ static inline int zbook_pin_gpio_write(struct zbook_pin *handle, enum zbook_pin_
 }
 
 /** @brief Typed helper: samples a GPIO pin. See zbook_pin_read(). */
-static inline int zbook_pin_gpio_read(struct zbook_pin *handle,
-				      enum zbook_pin_header_state *state)
+static inline int zbook_pin_gpio_read(struct zbook_pin *handle, enum zbook_pin_header_state *state)
 {
 	uint8_t v;
 	int ret = zbook_pin_read(handle, &v, sizeof(v));
@@ -232,6 +232,18 @@ static inline int zbook_pin_gpio_read(struct zbook_pin *handle,
 	}
 
 	return ret;
+}
+
+/** @brief Typed helper: changes the duty cycle (0-100 %) of a PWM pin. See zbook_pin_write(). */
+static inline int zbook_pin_pwm_set_duty(struct zbook_pin *handle, uint8_t duty_percent)
+{
+	return zbook_pin_write(handle, &duty_percent, sizeof(duty_percent));
+}
+
+/** @brief Typed helper: samples an ADC pin. See zbook_pin_read(). */
+static inline int zbook_pin_adc_read(struct zbook_pin *handle, uint16_t *sample)
+{
+	return zbook_pin_read(handle, sample, sizeof(*sample));
 }
 
 #ifdef __cplusplus

@@ -10,6 +10,7 @@ config ZBOOK_INTERFACE_IO_PINS
     bool "Enable ZBook Interface I/O - runtime pin functions"
     default y
     depends on ZBOOK_INTERFACE_IO
+    select PICOSDK_USE_PWM
     help
       Enable the header pin factory: assign a function (GPIO, UART, PWM, ADC)
       to a header pin at runtime and have it released/reconfigured on change.

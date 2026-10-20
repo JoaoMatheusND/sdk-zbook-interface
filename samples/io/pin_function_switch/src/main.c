@@ -7,8 +7,7 @@
  * call releases whatever the pin did before and brings up the new function,
  * so the same pin is reused without a rebuild or a devicetree change.
  *
- * Wire an LED (through a resistor) or a scope probe to the pin to see the
- * GPIO blink and the PWM fade; the ADC phase prints the voltage it sees.
+ * @TODO: ADjust the sample when all backends are implemented and tested @JoaoMatheusND.
  *
  * @author João Matheus Nascimento Dias (joao.dias@edge.ufal.br)
  * @version 0.1

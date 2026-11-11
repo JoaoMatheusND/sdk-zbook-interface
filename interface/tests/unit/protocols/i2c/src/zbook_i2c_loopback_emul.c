@@ -62,14 +62,9 @@ static void fill_read(struct zbook_i2c_loopback_data *data, struct i2c_msg *msg)
 	memset(msg->buf, data->read_byte, msg->len);
 }
 
-/* On a write-only transfer this just records the bytes, on a read-only
- * transfer it stuffs the buffer with the fixed byte set via
- * zbook_i2c_test_emul_set_read_byte(), and on a write-then-read transfer
- * (zbook_i2c_write_read()'s repeated-start pattern) it does both -- records
- * the write half and answers the read half with the same canned byte.
- */
+/* Records written bytes and answers reads with the configured byte */
 static int zbook_i2c_loopback_transfer(const struct emul *target, struct i2c_msg *msgs,
-					int num_msgs, int addr)
+				       int num_msgs, int addr)
 {
 	struct zbook_i2c_loopback_data *data = target->data;
 
@@ -103,14 +98,7 @@ static int zbook_i2c_loopback_init(const struct emul *target, const struct devic
 	return 0;
 }
 
-/*
- * zbook_i2c has no production driver of its own at this node (it's a bare
- * test target, only ever touched via zbook_i2c_write/read/write_read with a
- * runtime address) so there is normally no struct device here. EMUL_DT_DEFINE()'s
- * .dev = DEVICE_DT_GET(node_id) is dereferenced by emul_init_for_bus() to
- * match this node by name, so this no-op device exists purely to satisfy
- * the emulator framework in this test binary.
- */
+/* No-op device required by EMUL_DT_DEFINE() for the emulated target node */
 static int zbook_i2c_loopback_dev_init(const struct device *dev)
 {
 	ARG_UNUSED(dev);

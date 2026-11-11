@@ -5,7 +5,7 @@
  * @author Matheus Macário dos Santos (matheus.macario@edge.ufal.br)
  * @version 0.1
  * @date 18/09/2026
- * 
+ *
  * @copyright Copyright (c) Centro de Inovacao EDGE - 2026
  *
  *******************************************************************/
@@ -19,12 +19,13 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/__assert.h>
 
 LOG_MODULE_REGISTER(zbook_i2c, CONFIG_ZBOOK_I2C_LOG_LEVEL);
 
 static const struct device *const zbook_i2c_dev = DEVICE_DT_GET(DT_NODELABEL(i2c0));
 
-static bool i2c_ready = false;
+static bool i2c_ready;
 
 int zbook_i2c_init(void)
 {
@@ -41,10 +42,7 @@ int zbook_i2c_init(void)
 
 int zbook_i2c_configure(const struct zbook_i2c_cfg *cfg)
 {
-	if (!i2c_ready) {
-		LOG_ERR("zbook_i2c not initialized");
-		return -ENODEV;
-	}
+	__ASSERT(i2c_ready, "zbook_i2c not initialized");
 
 	if (cfg == NULL) {
 		LOG_ERR("invalid zbook_i2c config");
@@ -81,10 +79,7 @@ int zbook_i2c_configure(const struct zbook_i2c_cfg *cfg)
 
 int zbook_i2c_write(uint16_t addr, const uint8_t *buf, size_t len)
 {
-	if (!i2c_ready) {
-		LOG_ERR("zbook_i2c not initialized");
-		return -ENODEV;
-	}
+	__ASSERT(i2c_ready, "zbook_i2c not initialized");
 
 	if (buf == NULL || len == 0) {
 		LOG_ERR("invalid zbook_i2c write args");
@@ -102,10 +97,7 @@ int zbook_i2c_write(uint16_t addr, const uint8_t *buf, size_t len)
 
 int zbook_i2c_read(uint16_t addr, uint8_t *buf, size_t len)
 {
-	if (!i2c_ready) {
-		LOG_ERR("zbook_i2c not initialized");
-		return -ENODEV;
-	}
+	__ASSERT(i2c_ready, "zbook_i2c not initialized");
 
 	if (buf == NULL || len == 0) {
 		LOG_ERR("invalid zbook_i2c read args");
@@ -122,12 +114,9 @@ int zbook_i2c_read(uint16_t addr, uint8_t *buf, size_t len)
 }
 
 int zbook_i2c_write_read(uint16_t addr, const uint8_t *write_buf, size_t write_len,
-			  uint8_t *read_buf, size_t read_len)
+			 uint8_t *read_buf, size_t read_len)
 {
-	if (!i2c_ready) {
-		LOG_ERR("zbook_i2c not initialized");
-		return -ENODEV;
-	}
+	__ASSERT(i2c_ready, "zbook_i2c not initialized");
 
 	if (write_buf == NULL || write_len == 0 || read_buf == NULL || read_len == 0) {
 		LOG_ERR("invalid zbook_i2c write_read args");

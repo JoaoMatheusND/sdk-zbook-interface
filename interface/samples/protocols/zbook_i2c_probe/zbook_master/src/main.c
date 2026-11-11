@@ -22,6 +22,8 @@
 int main(void)
 {
 	int ret;
+	int found;
+	uint8_t dummy;
 
 	printk("zbook i2c bus scanner -- probing 0x%02x..0x%02x on the external header (H1)\n",
 	       SCAN_ADDR_MIN, SCAN_ADDR_MAX);
@@ -41,11 +43,9 @@ int main(void)
 	}
 
 	while (1) {
-		int found = 0;
+		found = 0;
 
 		for (uint16_t addr = SCAN_ADDR_MIN; addr <= SCAN_ADDR_MAX; addr++) {
-			uint8_t dummy;
-
 			if (zbook_i2c_read(addr, &dummy, sizeof(dummy)) == 0) {
 				printk("  ACK at 0x%02x\n", addr);
 				found++;
@@ -53,8 +53,8 @@ int main(void)
 		}
 
 		if (found == 0) {
-			printk("scan complete -- no device acked (0x%02x-0x%02x)\n",
-			       SCAN_ADDR_MIN, SCAN_ADDR_MAX);
+			printk("scan complete -- no device acked (0x%02x-0x%02x)\n", SCAN_ADDR_MIN,
+			       SCAN_ADDR_MAX);
 		} else {
 			printk("scan complete -- %d device(s) found\n", found);
 		}

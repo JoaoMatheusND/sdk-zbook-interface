@@ -19,20 +19,12 @@
 
 static const struct device *const i2c_dev = DEVICE_DT_GET(DT_NODELABEL(i2c0));
 
-/* Lit once the target is actually registered -- a glance at the board
- * confirms the fixture is up without needing RTT/serial hooked up.
- */
 static const struct gpio_dt_spec led0 = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
 
-/* Fixed reply byte for read probes -- the zbook test only checks that the
- * read succeeds (ACK), never the value, but a recognizable byte makes it
- * obvious in a logic analyzer capture which side sent it.
- */
 static uint8_t tx_byte = 0xA5;
 static uint8_t rx_buf[32];
 
-static int target_buf_read_requested(struct i2c_target_config *config, uint8_t **ptr,
-				      uint32_t *len)
+static int target_buf_read_requested(struct i2c_target_config *config, uint8_t **ptr, uint32_t *len)
 {
 	ARG_UNUSED(config);
 
@@ -42,8 +34,7 @@ static int target_buf_read_requested(struct i2c_target_config *config, uint8_t *
 	return 0;
 }
 
-static void target_buf_write_received(struct i2c_target_config *config, uint8_t *ptr,
-				       uint32_t len)
+static void target_buf_write_received(struct i2c_target_config *config, uint8_t *ptr, uint32_t len)
 {
 	ARG_UNUSED(config);
 
@@ -54,11 +45,6 @@ static void target_buf_write_received(struct i2c_target_config *config, uint8_t 
 	printk("\n");
 }
 
-/* The nRF TWIS driver (drivers/i2c/i2c_nrfx_twis.c) is DMA/buffer-based and
- * only ever calls the buf_* callbacks below -- write_requested/
- * read_requested/read_processed/stop are never invoked by this driver, so
- * they're omitted rather than left as dead code.
- */
 static const struct i2c_target_callbacks target_callbacks = {
 	.buf_read_requested = target_buf_read_requested,
 	.buf_write_received = target_buf_write_received,

@@ -1,20 +1,6 @@
 /*
- * Turns i2c0 into an I2C *target* (slave), answering at 0x50 -- matching
- * zbook-sdk's CONFIG_ZBOOK_TEST_I2C_EXTERNAL_ADDR default. The target
- * itself (address + callbacks) is registered in src/main.c via
- * i2c_target_register() directly against this bus device -- no
- * devicetree child node/driver needed. Using P0.02 (SDA) / P0.03 (SCL)
- * here instead of the DK's default Arduino I2C pins (P0.26/P0.27) --
- * both free header pins, not claimed by any on-board LED/button/UART --
- * purely to make wiring/troubleshooting easier; the TWIS peripheral
- * isn't tied to any particular pin pair, any two GPIOs work via pinctrl.
- *
- * Wire this bus to the zbook's GPIO header (H1, I2C_SDA/I2C_SCL) with a
- * common ground: nRF52 P0.02 <-> zbook I2C_SDA, nRF52 P0.03 <-> zbook
- * I2C_SCL. i2c0 normally runs as a TWI/TWIM *controller* -- overriding its
- * compatible to "nordic,nrf-twis" switches it to the TWIS *peripheral*
- * personality instead (a controller and a target can't share one instance
- * at the same time).
+ * i2c0 as an I2C target (TWIS) on P0.02 (SDA) and P0.03 (SCL).
+ * Wiring: P0.02 to zbook I2C_SDA, P0.03 to zbook I2C_SCL (header H1), common GND.
  */
 
 &pinctrl {

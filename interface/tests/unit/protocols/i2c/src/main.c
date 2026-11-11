@@ -12,35 +12,40 @@
 
 #include <errno.h>
 #include <zephyr/ztest.h>
+#include <zephyr/ztest_error_hook.h>
 #include <protocols/zbook_i2c.h>
 
 #include "zbook_i2c_loopback_emul.h"
 
-/* Matches boards/native_sim.overlay's zbook_i2c_target@50 -- a real,
- * ACKing device on the emulated bus, backed by zbook_i2c_loopback_emul.c.
- */
+/* Matches boards/native_sim.overlay's zbook_i2c_target@50 */
 #define ZBOOK_I2C_TEST_ADDR 0x50
 
-/* Reserved by the I2C spec (0x78-0x7F) -- no compliant device may claim
- * this address, so it doubles as a guaranteed-empty target for exercising
- * the "nothing answered" error path.
- */
+/* Reserved by the I2C spec (0x78-0x7F), no device answers on it */
 #define ZBOOK_I2C_RESERVED_ADDR 0x7F
 
 ZTEST_SUITE(zbook_i2c, NULL, NULL, NULL, NULL, NULL);
 
-ZTEST(zbook_i2c, test_00_not_ready_before_init)
+void ztest_post_assert_fail_hook(void)
+{
+	ztest_test_pass();
+}
+
+ZTEST(zbook_i2c, test_00_read_before_init_asserts)
 {
 	uint8_t byte = 0;
 
-	zassert_equal(-ENODEV, zbook_i2c_read(ZBOOK_I2C_TEST_ADDR, &byte, sizeof(byte)));
+	ztest_set_assert_valid(true);
+	zbook_i2c_read(ZBOOK_I2C_TEST_ADDR, &byte, sizeof(byte));
+	ztest_test_fail();
 }
 
-ZTEST(zbook_i2c, test_00a_configure_before_init)
+ZTEST(zbook_i2c, test_00a_configure_before_init_asserts)
 {
 	struct zbook_i2c_cfg cfg = {.speed = ZBOOK_I2C_SPEED_STANDARD_100K};
 
-	zassert_equal(-ENODEV, zbook_i2c_configure(&cfg));
+	ztest_set_assert_valid(true);
+	zbook_i2c_configure(&cfg);
+	ztest_test_fail();
 }
 
 ZTEST(zbook_i2c, test_01_init_ok)
@@ -140,7 +145,7 @@ ZTEST(zbook_i2c, test_write_with_nothing_attached_fails)
 	uint8_t byte = 0;
 
 	zassert_not_equal(zbook_i2c_write(ZBOOK_I2C_RESERVED_ADDR, &byte, sizeof(byte)), 0,
-			   "write() must fail when no device acks");
+			  "write() must fail when no device acks");
 }
 
 ZTEST(zbook_i2c, test_read_with_nothing_attached_fails)
@@ -148,7 +153,7 @@ ZTEST(zbook_i2c, test_read_with_nothing_attached_fails)
 	uint8_t byte = 0;
 
 	zassert_not_equal(zbook_i2c_read(ZBOOK_I2C_RESERVED_ADDR, &byte, sizeof(byte)), 0,
-			   "read() must fail when no device acks");
+			  "read() must fail when no device acks");
 }
 
 ZTEST(zbook_i2c, test_write_read_with_nothing_attached_fails)

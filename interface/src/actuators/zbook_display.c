@@ -87,6 +87,10 @@ static const enum display_draw_mode draw_mode_map[] = {
 	[ZBOOK_DISPLAY_PIXEL_INVERT] = DISPLAY_PIXEL_INVERT,
 };
 
+#if CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR
+static enum zbook_display_draw_mode current_mode = ZBOOK_DISPLAY_PIXEL_WHITE;
+#endif
+
 static void flush_vram(void)
 {
 	display_flush();
@@ -149,6 +153,11 @@ void zbook_display_clear(void)
 
 void zbook_display_flush(void)
 {
+#if CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR
+	zbook_display_draw_status_bar();
+	display_set_draw_mode(draw_mode_map[current_mode]);
+#endif
+
 	flush_vram();
 }
 
@@ -192,6 +201,10 @@ void zbook_display_set_draw_mode(enum zbook_display_draw_mode mode)
 	if ((unsigned int)mode >= ARRAY_SIZE(draw_mode_map)) {
 		return;
 	}
+
+#if CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR
+	current_mode = mode;
+#endif
 
 	display_set_draw_mode(draw_mode_map[mode]);
 }

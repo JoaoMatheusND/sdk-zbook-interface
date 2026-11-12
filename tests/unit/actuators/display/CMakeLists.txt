@@ -20,15 +20,29 @@ foreach(lib ${zephyr_libs})
     endif()
 endforeach()
 
+option(ZBOOK_TEST_STATUS_BAR "Build the display assets and the status bar" ON)
+
 target_sources(app PRIVATE
     src/main.c
     src/mock_display.c
     ${ZBOOK_INTERFACE_DIR}/src/actuators/zbook_display.c
 )
 
+if (ZBOOK_TEST_STATUS_BAR)
+    include(${ZBOOK_INTERFACE_DIR}/assets/assets.cmake)
+    zbook_generate_assets(ZBOOK_ASSETS_SRC ZBOOK_ASSETS_INC)
+    target_include_directories(app PRIVATE ${ZBOOK_ASSETS_INC})
+    target_sources(app PRIVATE
+        ${ZBOOK_INTERFACE_DIR}/src/actuators/zbook_display_assets.c
+        ${ZBOOK_ASSETS_SRC}
+    )
+endif()
+
 target_include_directories(app PRIVATE ${ZEPHYR_OLED_DISPLAY_MODULE_DIR}/includes)
 
 target_compile_definitions(app PRIVATE
     CONFIG_ZBOOK_INTERFACE_DISPLAY_DCDC=1
     CONFIG_ZBOOK_INTERFACE_DISPLAY_INIT_CONTRAST=77
+    CONFIG_ZBOOK_INTERFACE_ACTUATORS_DISPLAY_ASSETS=$<BOOL:${ZBOOK_TEST_STATUS_BAR}>
+    CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR=$<BOOL:${ZBOOK_TEST_STATUS_BAR}>
 )

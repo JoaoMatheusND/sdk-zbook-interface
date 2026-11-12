@@ -79,6 +79,15 @@ config ZBOOK_INTERFACE_ACTUATORS_DISPLAY
             help
             Build the display bitmaps (logo, status and UI icons), generated
             from interface/assets/ and declared in actuators/assets/assets.h.
+
+        config ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR
+            bool "Enable display status bar"
+            default n
+            depends on ZBOOK_INTERFACE_ACTUATORS_DISPLAY_ASSETS
+            help
+            Draw the status bar (Wi-Fi, Bluetooth, MicroSD and error icons)
+            in the top 16 rows on every zbook_display_flush(). Without it,
+            the whole screen is left to the application.
   endmenu
 
 endmenu

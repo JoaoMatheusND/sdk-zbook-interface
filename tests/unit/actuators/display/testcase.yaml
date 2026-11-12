@@ -9,3 +9,6 @@ common:
     - native_sim
 tests:
   interface.actuator.display: {}
+  interface.actuator.display.no_status_bar:
+    extra_args:
+      - ZBOOK_TEST_STATUS_BAR=OFF

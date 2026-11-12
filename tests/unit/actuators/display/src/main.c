@@ -13,13 +13,32 @@
 #include "actuators/zbook_display.h"
 #include "mock_display.h"
 
+#if CONFIG_ZBOOK_INTERFACE_ACTUATORS_DISPLAY_ASSETS
+#include "actuators/assets/assets.h"
+#endif
+
 #include <zephyr/ztest.h>
+
+#if CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR
+/**
+ * @brief Right edge of the status bar icons: the bar keeps the last 2 columns empty.
+ */
+#define BAR_RIGHT (SCR_W - 2)
+#endif
 
 static void before_each(void *fixture)
 {
 	ARG_UNUSED(fixture);
 
 	mock_display_reset();
+
+#if CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR
+	for (int i = 0; i < ZBOOK_DISPLAY_ICON_AMOUNT; i++) {
+		zbook_display_set_icon(i, ZBOOK_DISPLAY_ICON_HIDDEN);
+	}
+
+	zbook_display_set_wifi_level(ZBOOK_DISPLAY_WIFI_LEVEL_MAX);
+#endif
 }
 
 ZTEST_SUITE(zbook_display, NULL, NULL, before_each, NULL, NULL);
@@ -152,6 +171,114 @@ ZTEST(zbook_display, test_draw_mode_ignores_invalid_value)
 	zassert_equal(mock_display.draw_mode.calls, 0);
 }
 
+#if CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR
+
+ZTEST(zbook_display, test_flush_erases_status_bar_without_icons)
+{
+	zbook_display_flush();
+
+	zassert_equal(mock_display.rect.calls, 1);
+	zassert_equal(mock_display.rect.top, 0);
+	zassert_equal(mock_display.rect.left, 0);
+	zassert_equal(mock_display.rect.height, ZBOOK_DISPLAY_STATUS_BAR_H - 1);
+	zassert_equal(mock_display.rect.width, SCR_W - 1);
+	zassert_true(mock_display.rect.filled);
+	zassert_equal(mock_display.bitmap.calls, 0);
+	zassert_equal(mock_display.flush_calls, 1);
+}
+
+ZTEST(zbook_display, test_flush_draws_icons_right_aligned)
+{
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_WIFI, ZBOOK_DISPLAY_ICON_ON);
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_BLUETOOTH, ZBOOK_DISPLAY_ICON_OFF);
+	zbook_display_flush();
+
+	zassert_equal(mock_display.bitmap.calls, 2);
+	zassert_equal_ptr(mock_display.bitmap.bmp, zbook_bt_off);
+	zassert_equal(mock_display.bitmap.top, 0);
+	zassert_equal(mock_display.bitmap.left, BAR_RIGHT - ZBOOK_WIFI_W - 2 - ZBOOK_BT_W);
+	zassert_equal(mock_display.bitmap.width, ZBOOK_BT_W);
+	zassert_equal(mock_display.bitmap.height, ZBOOK_BT_H);
+}
+
+ZTEST(zbook_display, test_hidden_icon_gives_its_slot)
+{
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_BLUETOOTH, ZBOOK_DISPLAY_ICON_ON);
+	zbook_display_flush();
+
+	zassert_equal(mock_display.bitmap.calls, 1);
+	zassert_equal_ptr(mock_display.bitmap.bmp, zbook_bt);
+	zassert_equal(mock_display.bitmap.left, BAR_RIGHT - ZBOOK_BT_W);
+}
+
+ZTEST(zbook_display, test_flush_restores_user_draw_mode)
+{
+	zbook_display_set_draw_mode(ZBOOK_DISPLAY_PIXEL_INVERT);
+	zbook_display_flush();
+
+	zassert_equal(mock_display.draw_mode.mode, DISPLAY_PIXEL_INVERT);
+}
+
+ZTEST(zbook_display, test_set_icon_ignores_invalid_values)
+{
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_AMOUNT, ZBOOK_DISPLAY_ICON_ON);
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_WIFI, (enum zbook_display_icon_state)99);
+	zbook_display_flush();
+
+	zassert_equal(mock_display.bitmap.calls, 0);
+}
+
+ZTEST(zbook_display, test_wifi_on_draws_signal_level)
+{
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_WIFI, ZBOOK_DISPLAY_ICON_ON);
+	zbook_display_set_wifi_level(1);
+	zbook_display_flush();
+
+	zassert_equal(mock_display.bitmap.calls, 1);
+	zassert_equal_ptr(mock_display.bitmap.bmp, zbook_wifi_level_1);
+}
+
+ZTEST(zbook_display, test_wifi_level_ignores_invalid_value)
+{
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_WIFI, ZBOOK_DISPLAY_ICON_ON);
+	zbook_display_set_wifi_level(ZBOOK_DISPLAY_WIFI_LEVEL_MAX + 1);
+	zbook_display_flush();
+
+	zassert_equal_ptr(mock_display.bitmap.bmp, zbook_wifi_level_3);
+}
+
+ZTEST(zbook_display, test_icons_use_their_own_width)
+{
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_SD, ZBOOK_DISPLAY_ICON_ON);
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_ERROR, ZBOOK_DISPLAY_ICON_ON);
+	zbook_display_flush();
+
+	zassert_equal(mock_display.bitmap.calls, 2);
+	zassert_equal_ptr(mock_display.bitmap.bmp, zbook_error);
+	zassert_equal(mock_display.bitmap.width, ZBOOK_ERROR_W);
+	zassert_equal(mock_display.bitmap.left, BAR_RIGHT - ZBOOK_SD_W - 2 - ZBOOK_ERROR_W);
+}
+
+ZTEST(zbook_display, test_sd_off_draws_no_card)
+{
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_SD, ZBOOK_DISPLAY_ICON_OFF);
+	zbook_display_flush();
+
+	zassert_equal(mock_display.bitmap.calls, 1);
+	zassert_equal_ptr(mock_display.bitmap.bmp, zbook_sd_off);
+	zassert_equal(mock_display.bitmap.left, BAR_RIGHT - ZBOOK_SD_W);
+}
+
+ZTEST(zbook_display, test_error_off_is_hidden)
+{
+	zbook_display_set_icon(ZBOOK_DISPLAY_ICON_ERROR, ZBOOK_DISPLAY_ICON_OFF);
+	zbook_display_flush();
+
+	zassert_equal(mock_display.bitmap.calls, 0);
+}
+
+#else /* !CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR */
+
 ZTEST(zbook_display, test_flush_leaves_top_rows_to_the_user)
 {
 	zbook_display_set_draw_mode(ZBOOK_DISPLAY_PIXEL_INVERT);
@@ -167,3 +294,5 @@ ZTEST(zbook_display, test_flush_leaves_top_rows_to_the_user)
 	zassert_equal(mock_display.draw_mode.calls, 0, "flush must not touch the draw mode");
 	zassert_equal(mock_display.flush_calls, 1);
 }
+
+#endif /* CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR */

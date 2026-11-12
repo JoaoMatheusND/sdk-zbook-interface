@@ -38,6 +38,63 @@ enum zbook_display_draw_mode {
 	ZBOOK_DISPLAY_PIXEL_INVERT,    /**< Pixel on inverts the RAM. */
 };
 
+#if CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR
+
+/**
+ * @brief Height of the status bar, in pixels. Matches the yellow zone of the panel.
+ */
+#define ZBOOK_DISPLAY_STATUS_BAR_H 16
+
+/**
+ * @brief Highest Wi-Fi signal level, drawn with every arc lit.
+ */
+#define ZBOOK_DISPLAY_WIFI_LEVEL_MAX 3
+
+/**
+ * @brief Enumerates the status bar icons. The order sets the slots, from right to left.
+ */
+enum zbook_display_icon {
+	ZBOOK_DISPLAY_ICON_WIFI = 0,  /**< Wi-Fi icon. ON draws the signal level. */
+	ZBOOK_DISPLAY_ICON_BLUETOOTH, /**< Bluetooth icon. */
+	ZBOOK_DISPLAY_ICON_SD,        /**< MicroSD icon. ON = card inserted, OFF = no card. */
+	ZBOOK_DISPLAY_ICON_ERROR,     /**< Error icon. Has no OFF drawing, OFF hides it. */
+	ZBOOK_DISPLAY_ICON_AMOUNT,    /**< Amount of icons. */
+};
+
+/**
+ * @brief Enumerates the states of a status bar icon.
+ */
+enum zbook_display_icon_state {
+	ZBOOK_DISPLAY_ICON_HIDDEN = 0, /**< Icon is not drawn, the others take its slot. */
+	ZBOOK_DISPLAY_ICON_OFF,        /**< Icon is drawn slashed. */
+	ZBOOK_DISPLAY_ICON_ON,         /**< Icon is drawn normally. */
+};
+
+/**
+ * @brief Set the state of a status bar icon. Applied on the next flush.
+ *
+ * @param icon Icon to be set.
+ * @param state State to be set.
+ */
+void zbook_display_set_icon(enum zbook_display_icon icon, enum zbook_display_icon_state state);
+
+/**
+ * @brief Set the signal level drawn by the Wi-Fi icon while it is ON. Applied on the next flush.
+ *
+ * @param level Signal level, from 0 up to ZBOOK_DISPLAY_WIFI_LEVEL_MAX. Higher values are ignored.
+ */
+void zbook_display_set_wifi_level(uint8_t level);
+
+/**
+ * @brief Erase the status bar zone and draw the visible icons into the vRAM, right aligned.
+ * Hidden icons give their slot to the next ones. Already called by zbook_display_flush().
+ *
+ * @note Leaves the draw mode as ZBOOK_DISPLAY_PIXEL_WHITE.
+ */
+void zbook_display_draw_status_bar(void);
+
+#endif /* CONFIG_ZBOOK_INTERFACE_ACTUATOR_DISPLAY_STATUS_BAR */
+
 /**
  * @brief Inicializy the display with default settings.
  *
@@ -60,7 +117,8 @@ void zbook_display_enable(void);
 void zbook_display_clear(void);
 
 /**
- * @brief Send the vRAM to the display.
+ * @brief Send the vRAM to the display. When the status bar is enabled, it is redrawn
+ * on top of the vRAM first.
  */
 void zbook_display_flush(void);
 

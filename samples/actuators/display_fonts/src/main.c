@@ -1,7 +1,7 @@
 /************************************************************************
  * @file main.c
  *
- * @brief ZBook Display fonts sample: cycles through the font
+ * @brief ZBook Display fonts sample: shows the ZBook logo, then cycles through the font
  * sizes and scales.
  * @author João Matheus Nascimento Dias (joao.dias@edge.ufal.br)
  * @version 0.1

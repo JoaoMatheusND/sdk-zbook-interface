@@ -72,6 +72,13 @@ config ZBOOK_INTERFACE_ACTUATORS_DISPLAY
             help
             Contrast applied by zbook_display_init() right after the driver
             is initialized. 128 matches the driver default.
+
+        config ZBOOK_INTERFACE_ACTUATORS_DISPLAY_ASSETS
+            bool "Enable display assets"
+            default n
+            help
+            Build the display bitmaps (logo, status and UI icons), generated
+            from interface/assets/ and declared in actuators/assets/assets.h.
   endmenu
 
 endmenu

@@ -15,6 +15,14 @@
 #include "actuators/zbook_display.h"
 #include "display.h"
 
+#if CONFIG_ZBOOK_INTERFACE_ACTUATORS_DISPLAY_ASSETS
+#include <zephyr/kernel.h>
+
+#include "actuators/assets/assets.h"
+
+#define LOGO_TIME_MS 3000
+#endif
+
 #define SSD1306_MODE                                                                               \
 	(IS_ENABLED(CONFIG_OLED_DISPLAY_I2C) &&                                                    \
 	 DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_display), solomon_ssd1306))
@@ -88,6 +96,25 @@ static void flush_vram(void)
 #endif
 }
 
+#if CONFIG_ZBOOK_INTERFACE_ACTUATORS_DISPLAY_ASSETS
+static void draw_logo(void)
+{
+	const uint8_t top = (ZBOOK_DISPLAY_VISIBLE_H - ZBOOK_LOGO_H) / 2;
+	const uint8_t left = (ZBOOK_DISPLAY_VISIBLE_W - ZBOOK_LOGO_W) / 2;
+
+	display_clear();
+	display_draw_bitmap(zbook_logo, top, left, ZBOOK_LOGO_W, ZBOOK_LOGO_H, 1);
+	display_print((const uint8_t *)"P@2", top + 10, left + ((ZBOOK_LOGO_W - 17) / 2),
+		      FONT_SIZE_7, 1);
+
+	flush_vram();
+
+	k_msleep(LOGO_TIME_MS);
+
+	display_clear();
+}
+#endif
+
 void zbook_display_init(void)
 {
 	display_init(IS_ENABLED(CONFIG_ZBOOK_INTERFACE_DISPLAY_DCDC));
@@ -98,6 +125,10 @@ void zbook_display_init(void)
 
 #if !CONFIG_DISPLAY_VIRTUAL
 	display_set_contrast(CONFIG_ZBOOK_INTERFACE_DISPLAY_INIT_CONTRAST);
+#endif
+
+#if CONFIG_ZBOOK_INTERFACE_ACTUATORS_DISPLAY_ASSETS
+	draw_logo();
 #endif
 }
 

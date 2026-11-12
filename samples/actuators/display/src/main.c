@@ -1,7 +1,7 @@
 /************************************************************************
  * @file main.c
  *
- * @brief ZBook Display sample: cycles through shapes and text.
+ * @brief ZBook Display sample: shows the ZBook logo, then cycles through shapes and text.
  * @author João Matheus Nascimento Dias (joao.dias@edge.ufal.br)
  * @version 0.1
  * @date 27/10/2026

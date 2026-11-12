@@ -1,6 +1,6 @@
 sample:
   name: ZBook Display sample
-  description: Draws shapes and text on the ZBook OLED display.
+  description: Shows the ZBook logo, then draws shapes and text on the ZBook OLED display.
 common:
   tags:
     - interface

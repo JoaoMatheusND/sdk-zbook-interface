@@ -1,6 +1,6 @@
 sample:
   name: ZBook Display fonts sample
-  description: Prints text with every font size and scale of the ZBook OLED display.
+  description: Shows the ZBook logo, then prints text with every font size and scale of the ZBook OLED display.
 common:
   tags:
     - interface
